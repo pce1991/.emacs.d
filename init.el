@@ -78,6 +78,7 @@
 
 (add-hook 'csharp-mode-hook 'electric-pair-mode)
 (add-hook 'c-mode-hook 'electric-pair-mode)
+(add-hook 'c-mode-hook 'hs-minor-mode)
 
 (defvar eye/packages '(ace-isearch
                        ace-window
@@ -236,34 +237,6 @@
   (if pce-project-run-fn
       (funcall pce-project-run-fn pce-project-directory t)))
 
-;; (require 'compile)
-;; (setq compilation-read-command nil)
-
-;; (defun define-project (name directory build-script executable batch-script)
-;;   (let ((class-variables (list (cons nil (list (cons 'compile-command build-script)
-;;                                                (cons 'run-command executable)
-;;                                                (cons 'compile-batch-command batch-script))))))
-;;     (dir-locals-set-class-variables name class-variables))
-
-;;   (add-to-list 'safe-local-variable-values (cons 'compile-command build-script))
-;;   (add-to-list 'safe-local-variable-values (cons 'run-command executable))
-;;   (add-to-list 'safe-local-variable-values (cons 'compile-batch-command batch-script))
-;;   (dir-locals-set-directory-class directory name))
-
-;; (defun pce-compile ()
-;;   (interactive)
-;;   (if (get-buffer "*compilation*")
-;;       (kill-buffer "*compilation*"))
-;;   (let ((working-directory default-directory))
-;;     (cd (file-name-directory compile-command))
-;;     (call-interactively 'compile)
-;;     (cd working-directory)))
-
-;; ;; If we're in a batch file go ahead and run it with the args?
-;; (defun pce-run ()
-;;   (interactive)
-;;   (gdb (concat "gdb -i=mi -cd ~/etcetera " "./build/etcetera_linux")))
-
 ;ORG MODE
 (require 'org)
 (setq org-log-done t)
@@ -372,7 +345,9 @@
 
 
 (defun project-grep ()
-  '())
+  (interactive)
+  (cd pce-project-directory)
+  (call-interactively 'grep-find))
 
 ;my own minor mode to overwrite any key bindings I dislike. 
 (defvar my-keys-minor-mode-map
@@ -381,7 +356,7 @@
     ;; RIGHT HAND
     ;; TOP
     (define-key map (kbd "C-f") 'goto-line)
-    (define-key map (kbd "M-f") 'grep-find)
+    (define-key map (kbd "M-f") 'project-grep)
     (define-key map (kbd "M-G") 'goto-line)
     (define-key map (kbd "M-c") 'capitalize-backwards)
     (define-key map (kbd "C-r") 'repeat)
@@ -393,7 +368,7 @@
 
     (define-key map (kbd "C-n") 'next-line)
     (define-key map (kbd "M-n") 'end-of-defun)
-    (define-key map (kbd "C-M-n") 'gud-next-error)
+    (define-key map (kbd "C-M-n") 'gud-next)
     (define-key map (kbd "C-x C-n") 'next-error)
 
     (define-key map (kbd "C-M-s") 'gud-step)
@@ -403,7 +378,7 @@
     (define-key map (kbd "C-t") 'previous-line)
     (define-key map (kbd "M-t") 'beginning-of-defun)
     (define-key map (kbd "C-x C-t") 'previous-error)
-    (define-key map (kbd "C-M-t") 'gud-previous-error)
+    (define-key map (kbd "C-M-t") 'gud-previous)
     
     
     (define-key map (kbd "C-h") 'backward-char) 
@@ -421,9 +396,15 @@
 
     ;; LEFT HAND
     ;; TOP
-    (define-key map (kbd "C-p") 'ace-window)
+    (define-key map (kbd "C-p") 'other-window)
+    ;; C-0-9 for ace window
+    ;; (define-key map (kbd "C-1") '(ace-window 1))
+    ;; (define-key map (kbd "C-2") (lambda () (ace-window 2)))
+    ;; (define-key map (kbd "C-3") (lambda () (ace-window 3)))
+    ;; (define-key map (kbd "C-4") (lambda () (ace-window 4)))
     ;;(define-key map (kbd "M-p") 'other-frame)
-    (define-key map (kbd "M-p") 'switch-to-buffer)
+    (define-key map (kbd "M-p") 'ace-window)
+    (define-key map (kbd "C-M-p") 'switch-to-buffer)
 
     ;; MID
     (define-key map (kbd "C-a") 'beginning-of-line-custom)
@@ -454,6 +435,10 @@
     (define-key map (kbd "C-q") 'undo)
 
     (define-key map (kbd "M-RET") 'indent-new-comment-line)
+
+    (define-key map (kbd "C-<tab>") 'hs-show-block)
+    (define-key map (kbd "M-<tab>") 'hs-hide-block)
+    (define-key map (kbd "C-x <tab>") 'hs-hide-all)
 
     ;; need all and previous...
     ;; how often do I need to do this instead of just string replace?
