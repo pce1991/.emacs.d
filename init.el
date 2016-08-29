@@ -75,6 +75,18 @@
 
 (global-hl-line-mode t)
 
+(defvar my-cpp-other-file-alist
+  '(("\\.cpp\\'" (".h"))
+    ("\\.c\\'" (".h"))
+    ("\\.h\\'" (".c" ".cpp"))
+    ))
+
+(setq-default ff-other-file-alist 'my-cpp-other-file-alist)
+
+(add-hook 'c-initialization-hook (lambda ()
+    (define-key c-mode-base-map [(meta o)] 'ff-get-other-file))
+)
+
 
 (add-hook 'csharp-mode-hook 'electric-pair-mode)
 (add-hook 'c-mode-hook 'electric-pair-mode)
@@ -145,7 +157,7 @@
 (custom-set-faces '(default ((t (:inherit nil :stipple
   nil :background "Black" :foreground "Green" :inverse-video
   nil :box nil :strike-through nil :overline nil :underline
-  nil :slant normal :weight normal :height 98 :width
+  nil :slant normal :weight normal :height 100 :width
   normal :foundry "unknown" :family "Liberation Mono"))))
   '(error ((t (:foreground "Red" :weight bold))))
   '(font-lock-builtin-face ((t (:foreground "DodgerBlue"))))
@@ -159,9 +171,19 @@
   '(font-lock-variable-name-face ((t (:foreground "Yellow"))))
   '(highlight ((t (:background "gray20")))))
 
-(font-lock-add-keywords
- 'c-mode
- '(("\\<\\(\\sw+\\) ?(" 1 'font-lock-function-name-face)))
+;; (font-lock-add-keywords
+;;  'c++-mode
+;;  '(("\\<\\(\\sw+\\) ?(" 1 'font-lock-builtin-face)
+;;    ("->" . 'font-lock-string-face)
+;;    ("(" . 'font-lock-string-face)
+;;    (")" . 'font-lock-string-face)
+;;    ("[[]" . 'font-lock-string-face)
+;;    ("[]]" . 'font-lock-string-face)
+;;    ("{" . 'font-lock-string-face)
+;;    ("}" . 'font-lock-string-face)
+;;    ))
+
+;; (font-lock-add-keywords 'c-mode '((")" 1 'font-lock-string-face)))
 
 (require 'linum)
 
@@ -182,8 +204,6 @@
 	      (string-match "*" (buffer-name)))
     (linum-mode 1)))
 (provide 'linum-off)
-
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -258,41 +278,11 @@
                     :background "white"
                     :foreground "black")
 
-
-
-;; Define something other than j and l! (define-key helm-mode-map [tab] 'a-command)
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;BINDINGS BINDINGS BINDINGS BIDINGS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-;; think of useful prefix commands, things that make sense, maybe rebind to prefix keys? to k and m?
-;; think of most commonly used keybindings and place them on least stressful keys.
-;; Navigation keys: left, right for char and word, line, sentences, delimeters,
-;;                                                       (want to jump to beginning or end easily)
-;;                  up down for lines, blocks,
-;;                  Delete forward, back, within
-;;                  Comment/uncomment
-;;                  Mark, mark-like-this
-;;                  Kill-ring, kill, copy, paste, zap to char, undo
-;;                  Repeat previous command
-;;                  change buffer, frame
-;;                  open/save file
-;;                  Replace string (prompt and unprompted)
-;;                  Search, jump-to-char (on line and frame)
-;;                  Go to line
-;;                  M-^ delete-indentation
-;;                  Define/execute macro, save macro
-;;                  Transpose line,character (forward and back), and word
-;;                  Center/Top/Bottom line
-;;                  begining-of-defun/end-of-defun
-;;                  forwrad-list/backward-list
-;;                  smartscan
-;;                  Switch buffer
-
 
 ;;(define-key key-translation-map [?\C-h] [?\C-?])
 ;;(global-set-key [(hyper h)] 'help-command)
@@ -333,6 +323,11 @@
   (isearch-yank-string "{")
   )
 
+(defun forward-comma ()
+  (interactive)
+  (while (not (eq ?\' (char-after 1)))
+    (forward-char))) 
+
 
 
 (defun backward-bracket ()
@@ -343,18 +338,118 @@
   ;;(isearch-yank-string "{|}")
   )
 
+(require 'typopunct)
+(typopunct-change-language 'english t)
+
+;;(add-hook 'org-mode-hook 'my-org-init)
+;; (defun my-org-init ()
+;;   (require 'typopunct)
+;;   (typopunct-change-language 'english)
+;;   (typopunct-mode 1))
+
+(defconst typopunct-minus (decode-char 'ucs #x2212))
+(defconst typopunct-pm    (decode-char 'ucs #xB1))
+(defconst typopunct-mp    (decode-char 'ucs #x2213))
+(defadvice typopunct-insert-typographical-dashes
+    (around minus-or-pm activate)
+  (cond
+   ((or (eq (char-before) typopunct-em-dash)
+        (looking-back "\\([[:blank:]]\\|^\\)\\^"))
+    (delete-char -1)
+    (insert typopunct-minus))
+   ((looking-back "[^[:blank:]]\\^")
+    (insert typopunct-minus))
+   ((looking-back "+/")
+    (progn (replace-match "")
+           (insert typopunct-pm)))
+   (t ad-do-it)))
+(defun typopunct-insert-mp (arg)
+  (interactive "p")
+  (if (and (= 1 arg) (looking-back "-/"))
+      (progn (replace-match "")
+             (insert typopunct-mp))
+    (self-insert-command arg)))
+(define-key typopunct-map "+" 'typopunct-insert-mp)
 
 (defun project-grep ()
   (interactive)
   (cd pce-project-directory)
   (call-interactively 'grep-find))
 
-;my own minor mode to overwrite any key bindings I dislike. 
+(defun date ()
+  (interactive)
+  (format-time-string "%d.%m.%Y"))
+    
+
+(defun timestamp ()
+  (interactive)
+  (format-time-string "%Y-%m-%dT%H:%M:%S"))
+
+(defun pce-todo ()
+  (interactive)
+  (insert (concat "// TODO " (date) " @pce: ")))
+
+;; customize for C
+(setq punctuation '("(" ")"
+                    "{" "}"
+                    "[" "]"
+                    ","
+                    "."
+                    "!"
+                    "->"
+                    "&&"
+                    "||"
+                    "&"
+                    "*"
+                    ))
+
+(defun forward-punct ()
+  (interactive)
+  (search-forward-regexp punctuation-regex))
+
+(defun backward-punct ()
+  (interactive)
+  (search-backward-regexp punctuation-regex))
+
+(defun next-punct ()
+  (interactive)
+  (forward-punct)
+  (forward-punct)
+  (backward-punct))
+
+(defun previous-punct ()
+  (interactive)
+  (backward-punct)
+  (backward-punct)
+  (forward-punct))
+                      
+
+(setq punctuation-regex (regexp-opt punctuation))
+
+(defun next-word ()
+   "Move point to the beginning of the next word, past any spaces"
+   (interactive)
+   (forward-word)
+   (forward-word)
+   (backward-word))
+
+(defun previous-word ()
+   "Move point to the beginning of the next word, past any spaces"
+   (interactive)
+   (backward-word)
+   (backward-word)
+   (forward-word))
+
+
+
+
+;; unused keys 
 (defvar my-keys-minor-mode-map
   (let ((map (make-sparse-keymap)))
 
     ;; RIGHT HAND
     ;; TOP
+    (define-key map (kbd "C-x C-g") 'ff-find-other-file)
     (define-key map (kbd "C-f") 'goto-line)
     (define-key map (kbd "M-f") 'project-grep)
     (define-key map (kbd "M-G") 'goto-line)
@@ -365,24 +460,28 @@
     ;; MID
     (define-key map (kbd "C-s") 'forward-char)
     (define-key map (kbd "M-s") 'forward-word)
+    (define-key map (kbd "C-M-s") 'forward-punct)
+    ;;(define-key map (kbd "C-x C-s") 'gud-step)
 
     (define-key map (kbd "C-n") 'next-line)
-    (define-key map (kbd "M-n") 'end-of-defun)
+    (define-key map (kbd "M-n") 'forward-paragraph)
     (define-key map (kbd "C-M-n") 'gud-next)
     (define-key map (kbd "C-x C-n") 'next-error)
 
-    (define-key map (kbd "C-M-s") 'gud-step)
+    
     (define-key map (kbd "C-x C-b") 'gud-break)
-    (define-key map (kbd "C-x C-c") 'gud-break)
+    (define-key map (kbd "C-x C-c") 'pce-todo)
 
     (define-key map (kbd "C-t") 'previous-line)
-    (define-key map (kbd "M-t") 'beginning-of-defun)
+    (define-key map (kbd "M-t") 'backward-paragraph)
     (define-key map (kbd "C-x C-t") 'previous-error)
-    (define-key map (kbd "C-M-t") 'gud-previous)
+    ;; TODO: rebind to something useful
+    ;;(define-key map (kbd "C-M-t") 'gud-previous)
     
     
     (define-key map (kbd "C-h") 'backward-char) 
     (define-key map (kbd "M-h") 'backward-word)
+    (define-key map (kbd "C-M-h") 'backward-punct)
     ;;BOTTOM
     (define-key map (kbd "C-b") 'transpose-chars)
     (define-key map (kbd "M-b") 'transpose-words)
@@ -392,6 +491,8 @@
     (keyboard-translate ?\C-m ?\H-m)
     (define-key map [?\H-m] 'comment-region)
     (define-key map (kbd "M-m") 'uncomment-region)
+
+    (define-key map (kbd "C-<return>") 'switch-to-buffer)
     
 
     ;; LEFT HAND
@@ -422,12 +523,16 @@
     
     (define-key map (kbd "C-u") 'end-of-line)
     (define-key map (kbd "M-u") 'forward-sentence) ;; gets rebound to c-end-of-statement after c-mode activated
+    (define-key map (kbd "C-M-u") 'end-of-defun)
+    (define-key map (kbd "C-M-a") 'beginning-of-defun)
     (keyboard-translate ?\C-i ?\H-i)
     (global-set-key [?\H-i] 'universal-argument)
 
     ;; BOTTOM
-    (define-key map (kbd "C-z") 'avy-goto-char-2)
+    (define-key map (kbd "C-z") 'avy-goto-char)
     (define-key map (kbd "M-z") 'avy-goto-word-1)
+    (define-key map (kbd "C-M-z") 'avy-goto-char-2)
+    
 
     (define-key map (kbd "C-j") 'jump-to-open-bracket)
     (define-key map (kbd "M-j") 'jump-to-close-bracket)
@@ -438,7 +543,9 @@
 
     (define-key map (kbd "C-<tab>") 'hs-show-block)
     (define-key map (kbd "M-<tab>") 'hs-hide-block)
-    (define-key map (kbd "C-x <tab>") 'hs-hide-all)
+    (define-key map (kbd "C-x C-<tab>") 'hs-hide-all)
+
+    
 
     ;; need all and previous...
     ;; how often do I need to do this instead of just string replace?
@@ -674,8 +781,8 @@ With a prefix argument N, (un)comment that many sexps."
 
 (defun capitalize-backwards ()
   (interactive)
-;;  (backward-subword 1)
-  (backward-word 1)
+  (backward-subword 1)
+  ;(backward-word 1)
   (capitalize-word 1))
 
 ;;; Ideally it'd do all this without actually opening the buffers so that I could just continue with my work
@@ -700,7 +807,7 @@ With a prefix argument N, (un)comment that many sexps."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun pce-compile-etcetera-linux (directory)
-  (concat "ninja -f " directory "/build.ninja"))
+  (concat "python " directory "/build.py"))
 
 (defun pce-run-etcetera-linux (directory debug)
   (let ((exec-relative-path "build/etcetera_linux"))
