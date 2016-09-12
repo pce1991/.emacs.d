@@ -50,6 +50,8 @@
 
 (setq redisplay-dont-pause t)
 
+(global-auto-revert-mode 1)
+
 (defun set-window-undedicated-p (window flag)
  "Never set window dedicated."
  flag)
@@ -88,9 +90,11 @@
 )
 
 
-(add-hook 'csharp-mode-hook 'electric-pair-mode)
 (add-hook 'c-mode-hook 'electric-pair-mode)
 (add-hook 'c-mode-hook 'hs-minor-mode)
+
+(add-hook 'c++-mode-hook 'electric-pair-mode)
+(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 
 (defvar eye/packages '(ace-isearch
                        ace-window
@@ -132,6 +136,9 @@
 (global-linum-mode 1)
 (add-hook 'prog-mode-hook 'subword-mode)
 
+(add-hook 'comint-output-filter-functions
+          'comint-watch-for-password-prompt)
+
 ;; only want this to show things already defined...
 ;;(add-hook 'after-init-hook 'global-company-mode)
 
@@ -148,28 +155,41 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (custom-set-variables
-  '(global-linum-mode t)
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(global-linum-mode t)
  '(linum-delay t)
  '(linum-eager nil)
  '(windmove-wrap-around t))
 
 ;; Most important: types, variables, function-name
-(custom-set-faces '(default ((t (:inherit nil :stipple
-  nil :background "Black" :foreground "Green" :inverse-video
-  nil :box nil :strike-through nil :overline nil :underline
-  nil :slant normal :weight normal :height 100 :width
-  normal :foundry "unknown" :family "Liberation Mono"))))
-  '(error ((t (:foreground "Red" :weight bold))))
-  '(font-lock-builtin-face ((t (:foreground "DodgerBlue"))))
-  '(font-lock-comment-face ((t (:foreground "gray50"))))
-  '(font-lock-constant-face ((t (:foreground "Yellow"))))
-  '(font-lock-function-name-face ((t (:foreground "Red"))))
-  '(font-lock-keyword-face ((t (:foreground "Purple"))))
-  '(font-lock-negation-char-face ((t (:foreground "Red"))))
-  '(font-lock-string-face ((t (:foreground "White"))))
-  '(font-lock-type-face ((t (:foreground "Orange"))))
-  '(font-lock-variable-name-face ((t (:foreground "Yellow"))))
-  '(highlight ((t (:background "gray20")))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(default ((t (:inherit nil :stipple
+ nil :background "Black" :foreground "#49FF00" :inverse-video
+ nil :box nil :strike-through nil :overline nil :underline
+ nil :slant normal :weight normal :height 110 :width
+ normal :foundry "unknown"
+ ;;:family "Liberation Mono"
+ :family "Meslo LG S"
+ ))))
+ '(error ((t (:foreground "Red" :weight bold))))
+ '(font-lock-builtin-face ((t (:foreground "#bf55ff"))))
+ '(font-lock-comment-face ((t (:foreground "gray50"))))
+ '(font-lock-constant-face ((t (:foreground "Yellow"))))
+ '(font-lock-function-name-face ((t (:foreground "#ff1420"))))
+ '(font-lock-keyword-face ((t (:foreground "#cf55ff"))))
+ '(font-lock-negation-char-face ((t (:foreground "#ff0923"))))
+ '(font-lock-string-face ((t (:foreground "White"))))
+ '(font-lock-type-face ((t (:foreground "DodgerBlue"))))
+ '(font-lock-variable-name-face ((t (:foreground "Yellow"))))
+ '(helm-buffer-file ((t (:inherit default))))
+ '(highlight ((t (:background "gray20")))))
 
 ;; (font-lock-add-keywords
 ;;  'c++-mode
@@ -266,17 +286,20 @@
 
 (setq create-lockfiles nil)
 
+
+;;(ido-mode 1)
+
 ;;HELM
-(require 'helm-config)
-(helm-mode 1)
-(global-set-key (kbd "C-x C-f") 'helm-find-files)
+;; (require 'helm-config)
+;; (helm-mode 1)
+;; (global-set-key (kbd "C-x C-f") 'helm-find-files)
 
-(setq shackle-mode 1)
-(setq shackle-rules '(("\\`\\*helm.*?\\*\\'" :regexp t :align 'bottom :ratio 0.2)))
+;; (setq shackle-mode 1)
+;; (setq shackle-rules '(("\\`\\*helm.*?\\*\\'" :regexp t :align 'bottom :ratio 0.2)))
 
-(set-face-attribute 'helm-selection nil
-                    :background "white"
-                    :foreground "black")
+;; (set-face-attribute 'helm-selection nil
+;;                     :background "white"
+;;                     :foreground "black")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -311,76 +334,17 @@
       (isearch-yank-string regexp))
     (isearch-search-and-update))
 
-(defun forward-bracket ()
-  (interactive)
-  ;;(isearch-forward-regexp nil nil)
-  ;; Oh, this is searching for the regex itself in the buffer
-  ;; not the string that matches it!
-  ;;(isearch-forward 1 1)
-  ;;(isearch-yank-regexp (regexp-quote "{\\|}"))
-  ;;(isearch-yank-string (string ?{ ?\\ ?| ?}))
-  (isearch-forward nil 1)
-  (isearch-yank-string "{")
-  )
-
-(defun forward-comma ()
-  (interactive)
-  (while (not (eq ?\' (char-after 1)))
-    (forward-char))) 
-
-
-
-(defun backward-bracket ()
-  (interactive)
-  (isearch-backward nil 1)
-  (isearch-yank-string "}")
-  ;;(isearch-backward 1 1)
-  ;;(isearch-yank-string "{|}")
-  )
-
-(require 'typopunct)
-(typopunct-change-language 'english t)
-
-;;(add-hook 'org-mode-hook 'my-org-init)
-;; (defun my-org-init ()
-;;   (require 'typopunct)
-;;   (typopunct-change-language 'english)
-;;   (typopunct-mode 1))
-
-(defconst typopunct-minus (decode-char 'ucs #x2212))
-(defconst typopunct-pm    (decode-char 'ucs #xB1))
-(defconst typopunct-mp    (decode-char 'ucs #x2213))
-(defadvice typopunct-insert-typographical-dashes
-    (around minus-or-pm activate)
-  (cond
-   ((or (eq (char-before) typopunct-em-dash)
-        (looking-back "\\([[:blank:]]\\|^\\)\\^"))
-    (delete-char -1)
-    (insert typopunct-minus))
-   ((looking-back "[^[:blank:]]\\^")
-    (insert typopunct-minus))
-   ((looking-back "+/")
-    (progn (replace-match "")
-           (insert typopunct-pm)))
-   (t ad-do-it)))
-(defun typopunct-insert-mp (arg)
-  (interactive "p")
-  (if (and (= 1 arg) (looking-back "-/"))
-      (progn (replace-match "")
-             (insert typopunct-mp))
-    (self-insert-command arg)))
-(define-key typopunct-map "+" 'typopunct-insert-mp)
-
 (defun project-grep ()
   (interactive)
-  (cd pce-project-directory)
-  (call-interactively 'grep-find))
+  (let ((working-directory default-directory))
+        (cd pce-project-directory)
+        (call-interactively 'grep-find)
+        (cd working-directory)))
 
 (defun date ()
   (interactive)
   (format-time-string "%d.%m.%Y"))
     
-
 (defun timestamp ()
   (interactive)
   (format-time-string "%Y-%m-%dT%H:%M:%S"))
@@ -423,27 +387,8 @@
   (backward-punct)
   (forward-punct))
                       
-
 (setq punctuation-regex (regexp-opt punctuation))
 
-(defun next-word ()
-   "Move point to the beginning of the next word, past any spaces"
-   (interactive)
-   (forward-word)
-   (forward-word)
-   (backward-word))
-
-(defun previous-word ()
-   "Move point to the beginning of the next word, past any spaces"
-   (interactive)
-   (backward-word)
-   (backward-word)
-   (forward-word))
-
-
-
-
-;; unused keys 
 (defvar my-keys-minor-mode-map
   (let ((map (make-sparse-keymap)))
 
@@ -460,7 +405,7 @@
     ;; MID
     (define-key map (kbd "C-s") 'forward-char)
     (define-key map (kbd "M-s") 'forward-word)
-    (define-key map (kbd "C-M-s") 'forward-punct)
+    (define-key map (kbd "C-M-s") 'avy-goto-word-or-subword-1)
     ;;(define-key map (kbd "C-x C-s") 'gud-step)
 
     (define-key map (kbd "C-n") 'next-line)
@@ -481,9 +426,9 @@
     
     (define-key map (kbd "C-h") 'backward-char) 
     (define-key map (kbd "M-h") 'backward-word)
-    (define-key map (kbd "C-M-h") 'backward-punct)
+    (define-key map (kbd "C-M-h") 'avy-goto-char-2)
     ;;BOTTOM
-    (define-key map (kbd "C-b") 'transpose-chars)
+    (define-key map (kbd "C-b") 'switch-to-buffer)
     (define-key map (kbd "M-b") 'transpose-words)
     (define-key map (kbd "M-l") 'transpose-lines)
     ;; THUMB
@@ -511,14 +456,12 @@
     (define-key map (kbd "C-a") 'beginning-of-line-custom)
 
     (define-key map (kbd "C-o") 'isearch-backward)
-    (define-key map (kbd "M-o") 'backward-bracket)
+    (define-key map (kbd "M-o") 'avy-goto-line-above)
     (define-key isearch-mode-map "\C-o" 'isearch-repeat-backward)
-    (define-key isearch-mode-map "\M-o" 'isearch-repeat-backward)
 
     (define-key map (kbd "C-e") 'isearch-forward)
-    (define-key map (kbd "M-e") 'forward-bracket)
+    (define-key map (kbd "M-e") 'avy-goto-line-below)
     (define-key isearch-mode-map "\C-e" 'isearch-repeat-forward)
-    (define-key isearch-mode-map "\M-e" 'isearch-repeat-forward)
     
     
     (define-key map (kbd "C-u") 'end-of-line)
@@ -533,7 +476,6 @@
     (define-key map (kbd "M-z") 'avy-goto-word-1)
     (define-key map (kbd "C-M-z") 'avy-goto-char-2)
     
-
     (define-key map (kbd "C-j") 'jump-to-open-bracket)
     (define-key map (kbd "M-j") 'jump-to-close-bracket)
     
@@ -545,18 +487,14 @@
     (define-key map (kbd "M-<tab>") 'hs-hide-block)
     (define-key map (kbd "C-x C-<tab>") 'hs-hide-all)
 
-    
-
     ;; need all and previous...
     ;; how often do I need to do this instead of just string replace?
     (define-key map (kbd "M-SPC") 'mark-next-like-this)
 
-    
-
     (define-key map (kbd "<right>") 'gud-next)
     (define-key map (kbd "<down>") 'gud-step)
-    (define-key map (kbd "<up>") 'gud-break)
-    (define-key map (kbd "<left>") 'gud-break)
+    ;; (define-key map (kbd "<up>") 'gud-break)
+    ;; (define-key map (kbd "<left>") 'gud-break)
 
     ;; GUD-BINDINGS (arrows and Function keys)
    map)
@@ -578,6 +516,22 @@
     (push `(my-keys . ,newmap) minor-mode-overriding-map-alist)))
 
 (add-hook 'c-mode-common-hook 'my-c-mode-hook)
+
+(defun my-ivy-mode-hook ()
+  (let ((oldmap (cdr (assoc 'my-keys-minor-mode minor-mode-map-alist)))
+        (newmap (make-sparse-keymap)))
+    (set-keymap-parent newmap oldmap)
+    (define-key newmap (kbd "C-n") nil)
+    (define-key newmap (kbd "C-t") nil)
+    (make-local-variable 'minor-mode-overriding-map-alist)
+    (push `(my-keys-minor-mode . ,newmap) minor-mode-overriding-map-alist)))
+
+(add-hook 'minibuffer-setup-hook (lambda () (my-keys-minor-mode -1)
+                                   (define-key ivy-minibuffer-map (kbd "C-t") 'ivy-previous-line)))
+
+(add-hook 'minibuffer-exit-hook (lambda () (my-keys-minor-mode 1)))
+
+(ivy-mode 1)
 
 ;; (defvar shell-minor-mode-map
 ;;   (let ((map (make-sparse-keymap)))
@@ -807,13 +761,13 @@ With a prefix argument N, (un)comment that many sexps."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun pce-compile-etcetera-linux (directory)
-  (concat "python " directory "/build.py"))
+  (concat "time python2 " directory "/build.py"))
 
 (defun pce-run-etcetera-linux (directory debug)
   (let ((exec-relative-path "build/etcetera_linux"))
     (if debug
         (progn
-          (gdb (concat "gdb -i=mi -cd ~/etcetera " "./build/etcetera_linux")))
+          (gdb (concat "gdb --quiet -i=mi -cd ~/etcetera " "./build/etcetera_linux")))
       (progn
         (shell-command "~/etcetera/build/etcetera_linux")))))
 
