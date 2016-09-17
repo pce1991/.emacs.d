@@ -81,6 +81,8 @@
   '(("\\.cpp\\'" (".h"))
     ("\\.c\\'" (".h"))
     ("\\.h\\'" (".c" ".cpp"))
+    ("\\.vert\\'" (".frag"))
+    ("\\.frag\\'" (".vert"))
     ))
 
 (setq-default ff-other-file-alist 'my-cpp-other-file-alist)
@@ -95,15 +97,15 @@
 
 (add-hook 'c++-mode-hook 'electric-pair-mode)
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+(add-to-list 'auto-mode-alist '("\\.vert\\'" . c++-mode))
+(add-to-list 'auto-mode-alist '("\\.frag\\'" . c++-mode))
+(add-to-list 'auto-mode-alist '("\\.geom\\'" . c++-mode))
 
 (defvar eye/packages '(ace-isearch
                        ace-window
                        avy
-		       clojure-mode
 		       company
                        dictionary
-                       helm
-                       helm-swoop
                        irony
 		       magit
                        multiple-cursors
@@ -188,8 +190,7 @@
  '(font-lock-string-face ((t (:foreground "White"))))
  '(font-lock-type-face ((t (:foreground "DodgerBlue"))))
  '(font-lock-variable-name-face ((t (:foreground "Yellow"))))
- '(helm-buffer-file ((t (:inherit default))))
- '(highlight ((t (:background "gray20")))))
+  '(highlight ((t (:background "gray20")))))
 
 ;; (font-lock-add-keywords
 ;;  'c++-mode
@@ -277,6 +278,8 @@
   (if pce-project-run-fn
       (funcall pce-project-run-fn pce-project-directory t)))
 
+(setq compilation-skip-threshold 2)
+
 ;ORG MODE
 (require 'org)
 (setq org-log-done t)
@@ -286,20 +289,6 @@
 
 (setq create-lockfiles nil)
 
-
-;;(ido-mode 1)
-
-;;HELM
-;; (require 'helm-config)
-;; (helm-mode 1)
-;; (global-set-key (kbd "C-x C-f") 'helm-find-files)
-
-;; (setq shackle-mode 1)
-;; (setq shackle-rules '(("\\`\\*helm.*?\\*\\'" :regexp t :align 'bottom :ratio 0.2)))
-
-;; (set-face-attribute 'helm-selection nil
-;;                     :background "white"
-;;                     :foreground "black")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -517,17 +506,10 @@
 
 (add-hook 'c-mode-common-hook 'my-c-mode-hook)
 
-(defun my-ivy-mode-hook ()
-  (let ((oldmap (cdr (assoc 'my-keys-minor-mode minor-mode-map-alist)))
-        (newmap (make-sparse-keymap)))
-    (set-keymap-parent newmap oldmap)
-    (define-key newmap (kbd "C-n") nil)
-    (define-key newmap (kbd "C-t") nil)
-    (make-local-variable 'minor-mode-overriding-map-alist)
-    (push `(my-keys-minor-mode . ,newmap) minor-mode-overriding-map-alist)))
-
-(add-hook 'minibuffer-setup-hook (lambda () (my-keys-minor-mode -1)
-                                   (define-key ivy-minibuffer-map (kbd "C-t") 'ivy-previous-line)))
+(add-hook 'minibuffer-setup-hook
+          (lambda () (my-keys-minor-mode -1)
+            (define-key ivy-minibuffer-map (kbd "C-t") 'ivy-previous-line)
+            (define-key ivy-minibuffer-map (kbd "TAB") 'ivy-alt-done)))
 
 (add-hook 'minibuffer-exit-hook (lambda () (my-keys-minor-mode 1)))
 
@@ -545,9 +527,10 @@
 ;; (defun org-bindings ()
 ;;   (define-key my-keys-minor-mode-map (kbd "M-u") 'forward-sentence))
 
-;; (defun shell-bindings ()
-;;   (define-key my-keys-minor-mode-map (kbd "C-t") 'comint-previous-prompt)
-;;   (define-key my-keys-minor-mode-map (kbd "C-n") 'comint-next-prompt))
+;; (add-hook shell-mode-hook
+;;           (lambda ()
+;;             (define-key my-keys-minor-mode-map (kbd "C-t") 'comint-previous-prompt)
+;;             (define-key my-keys-minor-mode-map (kbd "C-n") 'comint-next-prompt)))
 
 (my-keys-minor-mode 1)
 (add-hook 'c-mode-common-hook 'c-bindings)
