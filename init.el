@@ -88,8 +88,7 @@
 (setq-default ff-other-file-alist 'my-cpp-other-file-alist)
 
 (add-hook 'c-initialization-hook (lambda ()
-    (define-key c-mode-base-map [(meta o)] 'ff-get-other-file))
-)
+    (define-key c-mode-base-map [(meta o)] 'ff-get-other-file)))
 
 
 (add-hook 'c-mode-hook 'electric-pair-mode)
@@ -101,18 +100,14 @@
 (add-to-list 'auto-mode-alist '("\\.frag\\'" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.geom\\'" . c++-mode))
 
-(defvar eye/packages '(ace-isearch
-                       ace-window
+(which-func-mode t)
+
+(defvar eye/packages '(ace-window
                        avy
-		       company
                        dictionary
-                       irony
-		       magit
+                       ivy
                        multiple-cursors
 		       org
-		       paredit
-                       smartscan
-                       yasnippet
                        zeal-at-point)
   "Default packages")
 
@@ -141,15 +136,19 @@
 (add-hook 'comint-output-filter-functions
           'comint-watch-for-password-prompt)
 
-;; only want this to show things already defined...
-;;(add-hook 'after-init-hook 'global-company-mode)
-
-; YA-Snippet
-;(global-set-key (kbd "C-c s") 'company-yasnippet)
-
 (put 'erase-buffer 'disabled nil)
 
 (defalias 'yes-or-no-p 'y-or-n-p)
+
+(setq-default mode-line-format
+              '("%e" mode-line-front-space
+                ;; Standard info about the current buffer
+                mode-line-frame-identification
+                mode-line-buffer-identification " " mode-line-position
+                " "
+                mode-line-misc-info
+                ;; And the modes, which I don't really care for anyway
+                " " mode-line-modes mode-line-end-spaces))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -234,9 +233,7 @@
 (setq-default c-basic-offset 4)
 ;indent switch statements
 (add-hook 'c-mode-common-hook
-          (lambda ()
-            (c-set-offset 'case-label '+)))
-
+          (lambda () (c-set-offset 'case-label '+)))
 
 (defvar pce-project-run-fn nil)
 
@@ -461,7 +458,7 @@
     (global-set-key [?\H-i] 'universal-argument)
 
     ;; BOTTOM
-    (define-key map (kbd "C-z") 'avy-goto-char)
+    (define-key map (kbd "C-z") 'avy-goto-char-2)
     (define-key map (kbd "M-z") 'avy-goto-word-1)
     (define-key map (kbd "C-M-z") 'avy-goto-char-2)
     
@@ -469,6 +466,7 @@
     (define-key map (kbd "M-j") 'jump-to-close-bracket)
     
     (define-key map (kbd "C-q") 'undo)
+    (define-key map (kbd "C-x C-q") 'undo)
 
     (define-key map (kbd "M-RET") 'indent-new-comment-line)
 
@@ -737,6 +735,12 @@ With a prefix argument N, (un)comment that many sexps."
 		     (capitalize word))
     (write-file "~/writing/dictionary/dictionary.org")
     (kill-buffer "dictionary.org")))
+
+(defun search-tags-org ()
+  (interactive)
+  ;; search the whole document for every # and list what follows in a buffer along with count
+  ;; When one is selected jump between instances of it.
+  )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
