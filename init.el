@@ -108,6 +108,7 @@
                        ivy
                        multiple-cursors
 		       org
+                       swiper
                        zeal-at-point)
   "Default packages")
 
@@ -140,8 +141,7 @@
 
 (defalias 'yes-or-no-p 'y-or-n-p)
 
-(setq-default mode-line-format
-              '("%e" mode-line-front-space
+(setq-default mode-line-format '("%e" mode-line-front-space
                 ;; Standard info about the current buffer
                 mode-line-frame-identification
                 mode-line-buffer-identification " " mode-line-position
@@ -175,10 +175,7 @@
  nil :background "Black" :foreground "#49FF00" :inverse-video
  nil :box nil :strike-through nil :overline nil :underline
  nil :slant normal :weight normal :height 110 :width
- normal :foundry "unknown"
- ;;:family "Liberation Mono"
- :family "Meslo LG S"
- ))))
+ normal :foundry "unknown" :family "Meslo LG S"))))
  '(error ((t (:foreground "Red" :weight bold))))
  '(font-lock-builtin-face ((t (:foreground "#bf55ff"))))
  '(font-lock-comment-face ((t (:foreground "gray50"))))
@@ -189,7 +186,9 @@
  '(font-lock-string-face ((t (:foreground "White"))))
  '(font-lock-type-face ((t (:foreground "DodgerBlue"))))
  '(font-lock-variable-name-face ((t (:foreground "Yellow"))))
-  '(highlight ((t (:background "gray20")))))
+ '(font-lock-which-func-face ((t (:foreground "Yellow"))))
+ '(highlight ((t (:background "gray20"))))
+ '(which-func ((t (:foreground "blue")))))
 
 ;; (font-lock-add-keywords
 ;;  'c++-mode
@@ -286,6 +285,7 @@
 
 (setq create-lockfiles nil)
 
+(setq avy-keys '(?a ?o ?e ?u ?h ?t ?n ?s ?i))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -302,16 +302,6 @@
     (back-to-indentation)
     (and (= oldpos (point))
          (beginning-of-line))))
-
-(defun jump-to-open-bracket ()
-  ;; avy jump to brackets only.
-  (interactive)
-  (avy-goto-char ?\{))
-
-(defun jump-to-close-bracket ()
-  ;; avy jump to brackets only.
-  (interactive)
-  (avy-goto-char ?\}))
 
 
  (defun isearch-yank-regexp (regexp)
@@ -383,7 +373,7 @@
     (define-key map (kbd "C-x C-g") 'ff-find-other-file)
     (define-key map (kbd "C-f") 'goto-line)
     (define-key map (kbd "M-f") 'project-grep)
-    (define-key map (kbd "M-G") 'goto-line)
+    (define-key map (kbd "M-g") 'avy-goto-line)
     (define-key map (kbd "M-c") 'capitalize-backwards)
     (define-key map (kbd "C-r") 'repeat)
     (define-key map (kbd "M-r") 'replace-string)
@@ -391,8 +381,7 @@
     ;; MID
     (define-key map (kbd "C-s") 'forward-char)
     (define-key map (kbd "M-s") 'forward-word)
-    (define-key map (kbd "C-M-s") 'avy-goto-word-or-subword-1)
-    ;;(define-key map (kbd "C-x C-s") 'gud-step)
+
 
     (define-key map (kbd "C-n") 'next-line)
     (define-key map (kbd "M-n") 'forward-paragraph)
@@ -405,6 +394,7 @@
 
     (define-key map (kbd "C-t") 'previous-line)
     (define-key map (kbd "M-t") 'backward-paragraph)
+    (define-key map (kbd "C-M-t") 'avy-goto-line-above)
     (define-key map (kbd "C-x C-t") 'previous-error)
     ;; TODO: rebind to something useful
     ;;(define-key map (kbd "C-M-t") 'gud-previous)
@@ -429,12 +419,6 @@
     ;; LEFT HAND
     ;; TOP
     (define-key map (kbd "C-p") 'other-window)
-    ;; C-0-9 for ace window
-    ;; (define-key map (kbd "C-1") '(ace-window 1))
-    ;; (define-key map (kbd "C-2") (lambda () (ace-window 2)))
-    ;; (define-key map (kbd "C-3") (lambda () (ace-window 3)))
-    ;; (define-key map (kbd "C-4") (lambda () (ace-window 4)))
-    ;;(define-key map (kbd "M-p") 'other-frame)
     (define-key map (kbd "M-p") 'ace-window)
     (define-key map (kbd "C-M-p") 'switch-to-buffer)
 
@@ -442,13 +426,14 @@
     (define-key map (kbd "C-a") 'beginning-of-line-custom)
 
     (define-key map (kbd "C-o") 'isearch-backward)
-    (define-key map (kbd "M-o") 'avy-goto-line-above)
-    (define-key isearch-mode-map "\C-o" 'isearch-repeat-backward)
+    (define-key map (kbd "M-o") 'swiper)
+    (define-key isearch-mode-map "\C-o" 'avy-isearch)
+    (define-key isearch-mode-map "\M-o" 'isearch-repeat-backward)
 
     (define-key map (kbd "C-e") 'isearch-forward)
-    (define-key map (kbd "M-e") 'avy-goto-line-below)
-    (define-key isearch-mode-map "\C-e" 'isearch-repeat-forward)
-    
+    (define-key map (kbd "M-e") 'swiper-avy)
+    (define-key isearch-mode-map "\C-e" 'avy-isearch)
+    ;;(define-key isearch-mode-map "\M-e" 'isearch-repeat-forward)
     
     (define-key map (kbd "C-u") 'end-of-line)
     (define-key map (kbd "M-u") 'forward-sentence) ;; gets rebound to c-end-of-statement after c-mode activated
@@ -458,11 +443,11 @@
     (global-set-key [?\H-i] 'universal-argument)
 
     ;; BOTTOM
-    (define-key map (kbd "C-z") 'avy-goto-char-2)
-    (define-key map (kbd "M-z") 'avy-goto-word-1)
-    (define-key map (kbd "C-M-z") 'avy-goto-char-2)
+    (define-key map (kbd "C-z") 'avy-goto-char-in-line)
+    (define-key map (kbd "M-z") 'zap-to-char)
+    (define-key map (kbd "C-M-z") 'avy-goto-word-1)
     
-    (define-key map (kbd "C-j") 'jump-to-open-bracket)
+    (define-key map (kbd "C-j") 'avy-goto-char-in-line)
     (define-key map (kbd "M-j") 'jump-to-close-bracket)
     
     (define-key map (kbd "C-q") 'undo)
@@ -473,6 +458,7 @@
     (define-key map (kbd "C-<tab>") 'hs-show-block)
     (define-key map (kbd "M-<tab>") 'hs-hide-block)
     (define-key map (kbd "C-x C-<tab>") 'hs-hide-all)
+    (define-key map (kbd "C-x M-<tab>") 'hs-show-all)
 
     ;; need all and previous...
     ;; how often do I need to do this instead of just string replace?
