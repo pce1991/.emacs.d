@@ -431,9 +431,9 @@
     (define-key isearch-mode-map "\M-o" 'isearch-repeat-backward)
 
     (define-key map (kbd "C-e") 'isearch-forward)
-    (define-key map (kbd "M-e") 'swiper-avy)
+    (define-key map (kbd "M-e") 'swiper)
     (define-key isearch-mode-map "\C-e" 'avy-isearch)
-    ;;(define-key isearch-mode-map "\M-e" 'isearch-repeat-forward)
+    (define-key isearch-mode-map "\M-e" 'isearch-repeat-forward)
     
     (define-key map (kbd "C-u") 'end-of-line)
     (define-key map (kbd "M-u") 'forward-sentence) ;; gets rebound to c-end-of-statement after c-mode activated
@@ -493,6 +493,8 @@
 (add-hook 'minibuffer-setup-hook
           (lambda () (my-keys-minor-mode -1)
             (define-key ivy-minibuffer-map (kbd "C-t") 'ivy-previous-line)
+            (define-key ivy-minibuffer-map (kbd "M-o") 'swiper-avy)
+            (define-key ivy-minibuffer-map (kbd "M-e") 'swiper-avy)
             (define-key ivy-minibuffer-map (kbd "TAB") 'ivy-alt-done)))
 
 (add-hook 'minibuffer-exit-hook (lambda () (my-keys-minor-mode 1)))
