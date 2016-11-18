@@ -105,6 +105,7 @@
 (defvar eye/packages '(ace-window
                        avy
                        dictionary
+                       evil
                        ivy
                        multiple-cursors
 		       org
@@ -362,6 +363,11 @@
   (backward-punct)
   (backward-punct)
   (forward-punct))
+
+(defun jump-to-next-brace ()
+  (interactive)
+  (avy-goto-char-in-line ?\{)
+  )
                       
 (setq punctuation-regex (regexp-opt punctuation))
 
@@ -385,7 +391,7 @@
 
     (define-key map (kbd "C-n") 'next-line)
     (define-key map (kbd "M-n") 'forward-paragraph)
-    (define-key map (kbd "C-M-n") 'gud-next)
+    ;;(define-key map (kbd "C-M-n") 'gud-next)
     (define-key map (kbd "C-x C-n") 'next-error)
 
     
@@ -396,8 +402,6 @@
     (define-key map (kbd "M-t") 'backward-paragraph)
     (define-key map (kbd "C-M-t") 'avy-goto-line-above)
     (define-key map (kbd "C-x C-t") 'previous-error)
-    ;; TODO: rebind to something useful
-    ;;(define-key map (kbd "C-M-t") 'gud-previous)
     
     
     (define-key map (kbd "C-h") 'backward-char) 
@@ -444,11 +448,13 @@
 
     ;; BOTTOM
     (define-key map (kbd "C-z") 'avy-goto-char-in-line)
-    (define-key map (kbd "M-z") 'zap-to-char)
-    (define-key map (kbd "C-M-z") 'avy-goto-word-1)
+    (define-key map (kbd "M-z") 'avy-goto-word-1)
+
+    (define-key map (kbd "C-k") 'zap-to-char)
+    (define-key map (kbd "M-k") 'kill-line)
     
-    (define-key map (kbd "C-j") 'avy-goto-char-in-line)
-    (define-key map (kbd "M-j") 'jump-to-close-bracket)
+    (define-key map (kbd "C-j") 'forward-sexp)
+    (define-key map (kbd "M-j") 'backward-sexp)
     
     (define-key map (kbd "C-q") 'undo)
     (define-key map (kbd "C-x C-q") 'undo)
@@ -745,6 +751,11 @@ With a prefix argument N, (un)comment that many sexps."
           (gdb (concat "gdb --quiet -i=mi -cd ~/etcetera " "./build/etcetera_linux")))
       (progn
         (shell-command "~/etcetera/build/etcetera_linux")))))
+
+(defun pce-debug-preprocessor ()
+  (interactive)
+  (let ((exec-relative-path "build/preprocssor"))
+    (gdb (concat "gdb --quiet -i=mi -cd ~/etcetera " "./build/preprocessor"))))
 
 (when (eq system-type 'gnu/linux)
   (global-set-key (kbd "C-x m") 'pce-compile-project)
