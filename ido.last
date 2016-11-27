@@ -1,0 +1,41 @@
+;;; -*- coding: utf-8 -*-
+
+;; ----- ido-last-directory-list -----
+(
+ ("/home/pce/etcetera/src/game/" . "tests/")
+ ("/home/pce/etcetera/src/" . "game/")
+ ("/home/pce/etcetera/" . "src/")
+ ("/home/pce/" . ".emacs.d/")
+)
+
+;; ----- ido-work-directory-list -----
+(
+ "/home/pce/.emacs.d/"
+ "/home/pce/etcetera/src/game/tests/"
+ "/home/pce/etcetera/src/"
+)
+
+;; ----- ido-work-file-list -----
+(
+ "init.el"
+ "ecs_test.cpp"
+ "debug.cpp"
+)
+
+;; ----- ido-dir-file-cache -----
+(
+ ("/home/pce/.emacs.d/" (22486 37997 333167 715000) "../" "elpa/" "var/" "./" "build/" "session.2d6e9e50d-83ed-488f-b816-6323c8e3693c" "ido.last" "session.24a7129ac-99ea-4947-904c-35d59cfaf418" "recentf" "auto-save-list/" "snippets/" ".git/" "init.el")
+
+ ("/home/pce/etcetera/src/game/tests/" (22485 59038 782885 271000) "../" "./" "font_test.cpp" "ecs_test.cpp" "texture_test.cpp" "swap_test.cpp")
+
+ ("/home/pce/etcetera/src/game/" (22485 59038 796218 603000) "../" "./" "forest_test/" "terrain.cpp" "tests/" "museum/" "kamikaze/" "model_test/" "last_letter/" "terrain.h" "text.cpp" "typist/")
+
+ ("/home/pce/etcetera/src/" (22485 59038 779551 937000) "assets.h" "../" "lockfree_queue.h" "task.h" "ecs.cpp" "./" "etcetera.cpp" "event.cpp" "debug.h" "game/" "meshdata.cpp" "commonlib.h" "platform/" "dynamic_array.h" "game.h" "preprocessor.cpp" "bucket_queue.h" "render.h" "assets.cpp" "entity.h" "etc_opengl.h" "ecs.h" "editor/" "platform.h" "hashtable.h" "math/" "etc_memory.h" "render.cpp" "input.h" "etc_types.h" "input.cpp" "core.cpp" "etc_imgui.cpp" "filehandle.h" "game.cpp" "event.h" "scenes.h" "etcetera.h" "debug.cpp" "etc_opengl.cpp" "io/" "task.cpp")
+
+ ("/home/pce/etcetera/" (22477 41560 136673 557000) "../" "build.ninja" "generated/" "todo.org" "./" "entities/" "build/" "test/" "lib/" ".gitignore" "README.md" "AnalyzeHeadersDoxyfile" "build_tools.ninja" "data/" "build.bat" "bin/" ".git/" "tools/" "src/" "build.py" "userdata/")
+
+ ("/home/pce/" (22486 37780 589833 354000) ".emacs.d/" "../" ".cache/" ".Xdefaults" ".viminfo" ".config/" "etcetera_animation/" ".bash_profile" ".bash_history" "./" "Videos/" ".ratpoisonrc" ".amd/" "imgui/" ".xfce4-session.verbose-log" ".~lock.AmericanThoughtFinal.odt#" "libgl_indirect_log" ".loki/" "budget.org" ".mozilla/" "prometheus/" "Pictures/" "ResumeProgramming.pdf" "handmade_hero/" ".xinitrc" "etcetera_script/" ".q3a/" "writing/" "controller/" ".gimp-2.8/" ".inputrc" "Papaya-master/" "Desktop/" "Desktop-1/" ".lesshst" ".bashrc" ".gnupg/" ".AMD/" ".elementary/" ".gitconfig" "Public/" "projects/" "lapack-3.6.1/" "library/" "text_editor.cpp" ".steam/" ".zsnes/" ".kde4/" ".gdbinit" "ResumeTeaching.pdf" ".conkeror.mozdev.org/" "etcetera/" ".local/" ".test.c.swp" "Music/" ".CodeXL/" "sphereClock.blend" ".lldb/" "Documents/" ".bash_logout" ".~lock.CormacResearch.docx#" "CodeXL_Linux_x86_64_2.2.511/" "sphereClock.blend1" "Resume.pdf" ".~lock.InTheRogueBlood.docx#" ".git-credentials" "Downloads/" ".steampath" "etcetera_unity/" "Desktop-2/" ".esd_auth" ".pulse-cookie" ".pki/" "catalyst.log" ".Xauthority" ".xfce4-session.verbose-log.last" ".thumbnails/" ".steampid" ".xinitrc~" ".e/" ".ratpoison_history")
+)
+
+;; ----- ido-unc-hosts-cache -----
+t
