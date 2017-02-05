@@ -1,5 +1,7 @@
 (setq user-full-name "Patrick Collin Eye")
 
+(setq debug-on-error t)
+
 (set-frame-parameter nil 'fullscreen 'fullboth)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 
@@ -460,9 +462,6 @@
 (my-keys-minor-mode 1)
 (add-hook 'c-mode-common-hook 'c-bindings)
 
-(define-minor-mode gud-minor-mode-map
-  :init-value t)
-
 (defun untabify-buffer ()
   (interactive)
   (untabify (point-min) (point-max)))
@@ -655,11 +654,7 @@ With a prefix argument N, (un)comment that many sexps."
 
 (defun pce-run-etcetera-linux (directory debug)
   (let ((exec-relative-path "build/etcetera_linux"))
-    (if debug
-        (progn
-          (gdb (concat "gdb --quiet -i=mi -cd ~/etcetera " "./build/etcetera_linux")))
-      (progn
-        (shell-command "~/etcetera/build/etcetera_linux")))))
+    (gdb (concat "gdb --quiet -i=mi -cd ~/etcetera " "./build/etcetera_linux"))))
 
 (defun pce-compile-etcetera-windows (directory)
   (concat "python " directory "/build.py"))
@@ -690,9 +685,7 @@ With a prefix argument N, (un)comment that many sexps."
         '(which-func ((t (:foreground "blue")))))
 
 (cond ((eq system-type 'gnu/linux)
-       
        (set-face-attribute 'default nil :family "Meslo LG S" :height 100)
-       
        (global-set-key (kbd "C-x m") 'pce-compile-project)
        (global-set-key (kbd "C-x C-r") 'pce-run-project-debug)
        (pce-define-project 'etcetera "~/etcetera" 'pce-compile-etcetera-linux 'pce-run-etcetera-linux)
