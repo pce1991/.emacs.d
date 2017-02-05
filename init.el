@@ -673,13 +673,8 @@ With a prefix argument N, (un)comment that many sexps."
   (let ((exec-relative-path "build/preprocssor"))
     (gdb (concat "gdb --quiet -i=mi -cd ~/etcetera " "./build/preprocessor"))))
 
-(cond ((eq system-type 'gnu/linux)
-       
-       (custom-set-faces
-        '(default ((t (:inherit nil :stipple nil :background "Black" :foreground "#49FF00"
-                                :inverse-video nil :box nil :strike-through nil :overline nil
-                                :underline nil :slant normal :weight normal :height 100 :width normal
-                                :foundry "unknown" :family "Meslo LG S"))))
+(custom-set-faces
+        '(default ((t (:background "Black" :foreground "#49FF00" :weight normal :height 100 :width normal))))
         '(error ((t (:foreground "Red" :weight bold))))
         '(font-lock-builtin-face ((t (:foreground "#bf55ff"))))
         '(font-lock-comment-face ((t (:foreground "gray50"))))
@@ -693,6 +688,10 @@ With a prefix argument N, (un)comment that many sexps."
         '(font-lock-which-func-face ((t (:foreground "Yellow"))))
         '(highlight ((t (:background "gray20"))))
         '(which-func ((t (:foreground "blue")))))
+
+(cond ((eq system-type 'gnu/linux)
+       
+       (set-face-attribute 'default nil :family "Meslo LG S" :height 100)
        
        (global-set-key (kbd "C-x m") 'pce-compile-project)
        (global-set-key (kbd "C-x C-r") 'pce-run-project-debug)
@@ -700,6 +699,13 @@ With a prefix argument N, (un)comment that many sexps."
        (cd "~/"))
 
       ((eq system-type 'windows-nt)
+
+       (set-face-attribute 'default nil :family "Consolas" :height 100)
+       
        (global-set-key (kbd "C-x m") 'pce-compile-project)
        (global-set-key (kbd "C-x C-r") 'pce-run-project)
-       (pce-define-project 'etcetera "~/etcetera" 'pce-compile-etcetera-windows 'pce-run-etcetera-windows)))
+       (pce-define-project 'etcetera "~/etcetera" 'pce-compile-etcetera-windows 'pce-run-etcetera-windows))
+
+      ((eq system-type 'darwin)
+
+       (set-face-attribute 'default nil :family "Menlo" :height 100)))
