@@ -36,8 +36,6 @@
 (load "package")
 (package-initialize)
 
-;;(shell)
-
 (setq-default indent-tabs-mode nil)
 (setq sentence-end-double-space nil)
 
@@ -100,17 +98,13 @@
 (add-to-list 'auto-mode-alist '("\\.frag\\'" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.geom\\'" . c++-mode))
 
-(which-func-mode t)
+(which-function-mode t)
 
 (defvar eye/packages '(ace-window
                        avy
-                       dictionary
-                       evil
                        ivy
-                       multiple-cursors
 		       org
-                       swiper
-                       zeal-at-point)
+                       swiper)
   "Default packages")
 
 
@@ -133,7 +127,8 @@
 (setq show-paren-delay 0) 
 
 (global-linum-mode 1)
-(add-hook 'prog-mode-hook 'subword-mode)
+;(add-hook 'prog-mode-hook 'subword-mode)
+(global-subword-mode 1)
 
 (add-hook 'comint-output-filter-functions
           'comint-watch-for-password-prompt)
@@ -151,59 +146,11 @@
                 ;; And the modes, which I don't really care for anyway
                 " " mode-line-modes mode-line-end-spaces))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;FONTS AND COLORS
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
  '(global-linum-mode t)
  '(linum-delay t)
  '(linum-eager nil)
  '(windmove-wrap-around t))
-
-;; Most important: types, variables, function-name
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple
- nil :background "Black" :foreground "#49FF00" :inverse-video
- nil :box nil :strike-through nil :overline nil :underline
- nil :slant normal :weight normal :height 110 :width
- normal :foundry "unknown" :family "Meslo LG S"))))
- '(error ((t (:foreground "Red" :weight bold))))
- '(font-lock-builtin-face ((t (:foreground "#bf55ff"))))
- '(font-lock-comment-face ((t (:foreground "gray50"))))
- '(font-lock-constant-face ((t (:foreground "Yellow"))))
- '(font-lock-function-name-face ((t (:foreground "#ff1420"))))
- '(font-lock-keyword-face ((t (:foreground "#cf55ff"))))
- '(font-lock-negation-char-face ((t (:foreground "#ff0923"))))
- '(font-lock-string-face ((t (:foreground "White"))))
- '(font-lock-type-face ((t (:foreground "DodgerBlue"))))
- '(font-lock-variable-name-face ((t (:foreground "Yellow"))))
- '(font-lock-which-func-face ((t (:foreground "Yellow"))))
- '(highlight ((t (:background "gray20"))))
- '(which-func ((t (:foreground "blue")))))
-
-;; (font-lock-add-keywords
-;;  'c++-mode
-;;  '(("\\<\\(\\sw+\\) ?(" 1 'font-lock-builtin-face)
-;;    ("->" . 'font-lock-string-face)
-;;    ("(" . 'font-lock-string-face)
-;;    (")" . 'font-lock-string-face)
-;;    ("[[]" . 'font-lock-string-face)
-;;    ("[]]" . 'font-lock-string-face)
-;;    ("{" . 'font-lock-string-face)
-;;    ("}" . 'font-lock-string-face)
-;;    ))
-
-;; (font-lock-add-keywords 'c-mode '((")" 1 'font-lock-string-face)))
 
 (require 'linum)
 
@@ -328,7 +275,7 @@
 
 (defun pce-todo ()
   (interactive)
-  (insert (concat "// TODO " (date) " @pce: ")))
+  (insert (concat "@pce: ")))
 
 ;; customize for C
 (setq punctuation '("(" ")"
@@ -429,14 +376,14 @@
     ;; MID
     (define-key map (kbd "C-a") 'beginning-of-line-custom)
 
-    (define-key map (kbd "C-o") 'isearch-backward)
-    (define-key map (kbd "M-o") 'swiper)
-    (define-key isearch-mode-map "\C-o" 'avy-isearch)
+    (define-key map (kbd "C-o") 'avy-goto-char-2-above)
+    (define-key map (kbd "M-o") 'isearch-backward)
+    (define-key map (kbd "C-M-o") 'swiper)
     (define-key isearch-mode-map "\M-o" 'isearch-repeat-backward)
 
-    (define-key map (kbd "C-e") 'isearch-forward)
-    (define-key map (kbd "M-e") 'swiper)
-    (define-key isearch-mode-map "\C-e" 'avy-isearch)
+    (define-key map (kbd "C-e") 'avy-goto-char-2-below)
+    (define-key map (kbd "M-e") 'isearch-forward)
+    (define-key map (kbd "C-M-e") 'swiper)
     (define-key isearch-mode-map "\M-e" 'isearch-repeat-forward)
     
     (define-key map (kbd "C-u") 'end-of-line)
@@ -507,52 +454,14 @@
 
 (ivy-mode 1)
 
-;; (defvar shell-minor-mode-map
-;;   (let ((map (make-sparse-keymap)))
-;;     (define-key map (kbd "C-t") ') ;; gets rebound to c-end-of-statement after c-mode activated
-;;     map)
-;;   "shell-minor-mode-map")
-
 (defun c-bindings ()
   (define-key my-keys-minor-mode-map (kbd "M-u") 'c-end-of-statement))
 
-;; (defun org-bindings ()
-;;   (define-key my-keys-minor-mode-map (kbd "M-u") 'forward-sentence))
-
-;; (add-hook shell-mode-hook
-;;           (lambda ()
-;;             (define-key my-keys-minor-mode-map (kbd "C-t") 'comint-previous-prompt)
-;;             (define-key my-keys-minor-mode-map (kbd "C-n") 'comint-next-prompt)))
-
 (my-keys-minor-mode 1)
 (add-hook 'c-mode-common-hook 'c-bindings)
-;; (add-hook 'org-mode-hook 'org-bindings)
-;; (add-hook 'shell-mode-hook 'shell-bindings)
-
-
-;; maybe put this as a modal mode, but make sure navigation stuff is unaffected...
-;; just use function keys?
-(defvar gud-minor-mode-map
-  (let ((map (make-sparse-keymap)))
-    ;; break at line
-    ;; break at function
-    ;; print var/expression
-    ;; watch var
-    ;; run
-    ;; step
-    ;; next
-    ;; continue
-    ;; quit
-    map)
-  "gud-minor-mode-map")
 
 (define-minor-mode gud-minor-mode-map
   :init-value t)
-
-;(add-hook 'gud-minor-mode-map )
-
-;(global-set-key (kbd "C-?") 'dictionary-search)
-
 
 (defun untabify-buffer ()
   (interactive)
@@ -752,13 +661,45 @@ With a prefix argument N, (un)comment that many sexps."
       (progn
         (shell-command "~/etcetera/build/etcetera_linux")))))
 
+(defun pce-compile-etcetera-windows (directory)
+  (concat "python " directory "/build.py"))
+
+(defun pce-run-etcetera-windows (directory debug)
+  (let ((exec-relative-path "build/etcetera_linux"))
+    (shell-command "~/etcetera/build/etcetera_linux")))
+
 (defun pce-debug-preprocessor ()
   (interactive)
   (let ((exec-relative-path "build/preprocssor"))
     (gdb (concat "gdb --quiet -i=mi -cd ~/etcetera " "./build/preprocessor"))))
 
-(when (eq system-type 'gnu/linux)
-  (global-set-key (kbd "C-x m") 'pce-compile-project)
-  (global-set-key (kbd "C-x C-r") 'pce-run-project-debug)
-  (pce-define-project 'etcetera "~/etcetera" 'pce-compile-etcetera-linux 'pce-run-etcetera-linux)
-  (cd "~/"))
+(cond ((eq system-type 'gnu/linux)
+       
+       (custom-set-faces
+        '(default ((t (:inherit nil :stipple nil :background "Black" :foreground "#49FF00"
+                                :inverse-video nil :box nil :strike-through nil :overline nil
+                                :underline nil :slant normal :weight normal :height 100 :width normal
+                                :foundry "unknown" :family "Meslo LG S"))))
+        '(error ((t (:foreground "Red" :weight bold))))
+        '(font-lock-builtin-face ((t (:foreground "#bf55ff"))))
+        '(font-lock-comment-face ((t (:foreground "gray50"))))
+        '(font-lock-constant-face ((t (:foreground "Yellow"))))
+        '(font-lock-function-name-face ((t (:foreground "#ff1420"))))
+        '(font-lock-keyword-face ((t (:foreground "#cf55ff"))))
+        '(font-lock-negation-char-face ((t (:foreground "#ff0923"))))
+        '(font-lock-string-face ((t (:foreground "White"))))
+        '(font-lock-type-face ((t (:foreground "DodgerBlue"))))
+        '(font-lock-variable-name-face ((t (:foreground "Yellow"))))
+        '(font-lock-which-func-face ((t (:foreground "Yellow"))))
+        '(highlight ((t (:background "gray20"))))
+        '(which-func ((t (:foreground "blue")))))
+       
+       (global-set-key (kbd "C-x m") 'pce-compile-project)
+       (global-set-key (kbd "C-x C-r") 'pce-run-project-debug)
+       (pce-define-project 'etcetera "~/etcetera" 'pce-compile-etcetera-linux 'pce-run-etcetera-linux)
+       (cd "~/"))
+
+      ((eq system-type 'windows-nt)
+       (global-set-key (kbd "C-x m") 'pce-compile-project)
+       (global-set-key (kbd "C-x C-r") 'pce-run-project)
+       (pce-define-project 'etcetera "~/etcetera" 'pce-compile-etcetera-windows 'pce-run-etcetera-windows)))
