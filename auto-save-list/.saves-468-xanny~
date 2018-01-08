@@ -1,6 +1,8 @@
-/home/pce/etcetera/build.py
-/tmp/#!home!pce!etcetera!build.py#
-/home/pce/etcetera/src/assets.h
-/tmp/#!home!pce!etcetera!src!assets.h#
-/home/pce/etcetera/src/debug.cpp
-/tmp/#!home!pce!etcetera!src!debug.cpp#
+/home/pce/etcetera/src/editor/script_editor.cpp
+/tmp/#!home!pce!etcetera!src!editor!script_editor.cpp#
+/home/pce/etcetera/src/etcetera.cpp
+/tmp/#!home!pce!etcetera!src!etcetera.cpp#
+/home/pce/etcetera/src/render.cpp
+/tmp/#!home!pce!etcetera!src!render.cpp#
+/home/pce/etcetera/src/task.cpp
+/tmp/#!home!pce!etcetera!src!task.cpp#

@@ -1,6 +1,6 @@
 (setq user-full-name "Patrick Collin Eye")
 
-(setq debug-on-error t)
+;;(setq debug-on-error t)
 
 (set-frame-parameter nil 'fullscreen 'fullboth)
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
@@ -96,6 +96,7 @@
 
 (add-hook 'c++-mode-hook 'electric-pair-mode)
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
+(add-to-list 'auto-mode-alist '("\\.glsl\\'" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.vert\\'" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.frag\\'" . c++-mode))
 (add-to-list 'auto-mode-alist '("\\.geom\\'" . c++-mode))
@@ -106,6 +107,7 @@
                        avy
                        ivy
 		       org
+                       sr-speedbar
                        swiper)
   "Default packages")
 
@@ -174,6 +176,8 @@
     (linum-mode 1)))
 (provide 'linum-off)
 
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;C STUFF
@@ -236,6 +240,9 @@
 (setq create-lockfiles nil)
 
 (setq avy-keys '(?a ?o ?e ?u ?h ?t ?n ?s ?i))
+
+;;(require 'sr-speedbar)
+(setq gdb-speedbar-auto-raise 1)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -419,8 +426,8 @@
     ;; how often do I need to do this instead of just string replace?
     (define-key map (kbd "M-SPC") 'mark-next-like-this)
 
-    (define-key map (kbd "<right>") 'gud-next)
-    (define-key map (kbd "<down>") 'gud-step)
+    ;; (define-key map (kbd "<right>") 'gud-next)
+    ;; (define-key map (kbd "<down>") 'gud-step)
     ;; (define-key map (kbd "<up>") 'gud-break)
     ;; (define-key map (kbd "<left>") 'gud-break)
 
@@ -650,26 +657,31 @@ With a prefix argument N, (un)comment that many sexps."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun pce-compile-etcetera-linux (directory)
-  (concat "time python2 " directory "/build.py"))
+  (concat "time python2 " directory "/build.py game"))
 
 (defun pce-run-etcetera-linux (directory debug)
   (let ((exec-relative-path "build/etcetera_linux"))
-    (gdb (concat "gdb --quiet -i=mi -cd ~/etcetera " "./build/etcetera_linux"))))
+    (gdb (concat "gdb --quiet -i=mi -cd ~/svn/etcetera " "./build/etcetera_linux"))))
 
 (defun pce-compile-etcetera-windows (directory)
   (concat "python " directory "/build.py"))
 
 (defun pce-run-etcetera-windows (directory debug)
   (let ((exec-relative-path "build/etcetera_linux"))
-    (shell-command "~/etcetera/build/etcetera_linux")))
+    (shell-command "~/svn/etcetera/build/etcetera_linux")))
 
 (defun pce-debug-preprocessor ()
   (interactive)
   (let ((exec-relative-path "build/preprocssor"))
-    (gdb (concat "gdb --quiet -i=mi -cd ~/etcetera " "./build/preprocessor"))))
+    (gdb (concat "gdb --quiet -i=mi -cd ~/svn/etcetera " "./build/preprocessor"))))
 
-(custom-set-faces
-        '(default ((t (:background "Black" :foreground "#49FF00" :weight normal :height 100 :width normal))))
+
+(cond ((eq system-type 'gnu/linux)
+
+       (custom-set-faces
+
+        '(default ((t (:background "Black" :foreground "#49FF00" :family "Meslo LG S"
+                                   :height 100 :weight normal :height 100 :width normal))))
         '(error ((t (:foreground "Red" :weight bold))))
         '(font-lock-builtin-face ((t (:foreground "#bf55ff"))))
         '(font-lock-comment-face ((t (:foreground "gray50"))))
@@ -683,13 +695,12 @@ With a prefix argument N, (un)comment that many sexps."
         '(font-lock-which-func-face ((t (:foreground "Yellow"))))
         '(highlight ((t (:background "gray20"))))
         '(which-func ((t (:foreground "blue")))))
-
-(cond ((eq system-type 'gnu/linux)
-       (set-face-attribute 'default nil :family "Meslo LG S" :height 100)
+       
        (global-set-key (kbd "C-x m") 'pce-compile-project)
        (global-set-key (kbd "C-x C-r") 'pce-run-project-debug)
-       (pce-define-project 'etcetera "~/etcetera" 'pce-compile-etcetera-linux 'pce-run-etcetera-linux)
-       (cd "~/"))
+       (pce-define-project 'etcetera "~/svn/etcetera" 'pce-compile-etcetera-linux 'pce-run-etcetera-linux)
+       (cd "~/svn/etcetera")
+       )
 
       ((eq system-type 'windows-nt)
 
@@ -697,7 +708,7 @@ With a prefix argument N, (un)comment that many sexps."
        
        (global-set-key (kbd "C-x m") 'pce-compile-project)
        (global-set-key (kbd "C-x C-r") 'pce-run-project)
-       (pce-define-project 'etcetera "~/etcetera" 'pce-compile-etcetera-windows 'pce-run-etcetera-windows))
+       (pce-define-project 'etcetera "~/svn/etcetera" 'pce-compile-etcetera-windows 'pce-run-etcetera-windows))
 
       ((eq system-type 'darwin)
 
